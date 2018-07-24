@@ -1,3 +1,6 @@
+/*
+Package vnt provides support for parsing Samsung vNote 1.1
+*/
 package vnt
 
 import (
@@ -9,14 +12,16 @@ import (
 	"time"
 )
 
+//Note describes a vNote
 type Note struct {
 	Body         string
 	Created      time.Time
 	LastModified time.Time
 }
 
-var InvalidFormat error = errors.New("invalid vNote 1.1 format")
+var errInvalidFormat = errors.New("invalid vNote 1.1 format")
 
+//Parse returns the parsed vNote from r
 func Parse(r io.Reader) (Note, error) {
 	scanner := bufio.NewScanner(r)
 	lines := []string{}
@@ -25,17 +30,17 @@ func Parse(r io.Reader) (Note, error) {
 	}
 
 	if len(lines) != 6 || lines[0] != "BEGIN:VNOTE" || lines[1] != "VERSION:1.1" || lines[5] != "END:VNOTE" {
-		return Note{}, InvalidFormat
+		return Note{}, errInvalidFormat
 	}
 
 	idx := strings.Index(lines[2], ":")
 	if idx == -1 {
-		return Note{}, InvalidFormat
+		return Note{}, errInvalidFormat
 	}
 
 	metadatas := strings.Split(lines[2][:idx], ";")
 	if len(metadatas) != 3 || metadatas[0] != "BODY" {
-		return Note{}, InvalidFormat
+		return Note{}, errInvalidFormat
 	}
 	if metadatas[1] != "CHARSET=UTF-8" {
 		return Note{}, errors.New("unsuported charset")

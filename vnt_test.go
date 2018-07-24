@@ -1,6 +1,7 @@
 package vnt
 
 import (
+	"fmt"
 	"strings"
 	"testing"
 	"time"
@@ -42,4 +43,18 @@ END:VNOTE`, Note{
 			t.Errorf("Parse(%q) = %s, want %s", test.vnote, actual, test.expected)
 		}
 	}
+}
+
+func ExampleParse() {
+
+	input := `BEGIN:VNOTE
+VERSION:1.1
+BODY;CHARSET=UTF-8;ENCODING=QUOTED-PRINTABLE:Fran=C3=A7ois-J=C3=A9r=C3=B4me
+DCREATED:20171007T161520
+LAST-MODIFIED:20171108T171055
+END:VNOTE`
+
+	note, _ := Parse(strings.NewReader(input))
+	fmt.Println(note.Body)
+	// Output: François-Jérôme
 }
